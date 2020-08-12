@@ -8,8 +8,8 @@ def focal_loss(hm_pred, hm_true):
     neg_mask = tf.cast(tf.less(hm_true, 1), tf.float32)
     neg_weights = tf.pow(1 - hm_true, 4)
 
-    pos_loss = -tf.log(tf.clip_by_value(hm_pred, 1e-4, 1. - 1e-4)) * tf.pow(1 - hm_pred, 2) * pos_mask
-    neg_loss = -tf.log(tf.clip_by_value(1 - hm_pred, 1e-4, 1. - 1e-4)) * tf.pow(hm_pred, 2) * neg_weights * neg_mask
+    pos_loss = -tf.compat.v1.log(tf.clip_by_value(hm_pred, 1e-4, 1. - 1e-4)) * tf.pow(1 - hm_pred, 2) * pos_mask
+    neg_loss = -tf.compat.v1.log(tf.clip_by_value(1 - hm_pred, 1e-4, 1. - 1e-4)) * tf.pow(hm_pred, 2) * neg_weights * neg_mask
 
     num_pos = tf.reduce_sum(pos_mask)
     pos_loss = tf.reduce_sum(pos_loss)

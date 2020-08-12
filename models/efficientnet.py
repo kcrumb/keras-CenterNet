@@ -1,6 +1,7 @@
 from keras_resnet import models as resnet_models
 from keras.applications.resnet50 import ResNet50
 from keras.layers import Input, Conv2DTranspose, BatchNormalization, ReLU, Conv2D, Lambda, MaxPooling2D, Dropout
+from keras.layers import ZeroPadding2D
 from keras.models import Model
 from keras.regularizers import l2
 import keras.backend as K
@@ -108,11 +109,12 @@ def decode(hm, wh, reg, max_objects=100, nms=True, flip_test=False, num_classes=
     return detections
 
 
-def centernet(num_classes, backbone='resnet50', input_size=512, max_objects=100, score_threshold=0.1,
+def centernet(num_classes, backbone='effcientnet-b0', input_size=512, max_objects=100, score_threshold=0.1,
               nms=True,
               flip_test=False,
               freeze_bn=True):
-    assert backbone in ['resnet18', 'resnet34', 'resnet50', 'resnet101', 'resnet152']
+    assert backbone in ['effcientnet-b0', 'effcientnet-b1', 'effcientnet-b2', 'effcientnet-b3', 'effcientnet-b4',
+                        'effcientnet-b5', 'effcientnet-b6', 'effcientnet-b7']
     output_size = input_size // 4
     image_input = Input(shape=(None, None, 3))
     hm_input = Input(shape=(output_size, output_size, num_classes))
@@ -121,20 +123,12 @@ def centernet(num_classes, backbone='resnet50', input_size=512, max_objects=100,
     reg_mask_input = Input(shape=(max_objects,))
     index_input = Input(shape=(max_objects,))
 
-    if backbone == 'resnet18':
-        resnet = resnet_models.ResNet18(image_input, include_top=False, freeze_bn=freeze_bn)
-    elif backbone == 'resnet34':
-        resnet = resnet_models.ResNet34(image_input, include_top=False, freeze_bn=freeze_bn)
-    elif backbone == 'resnet50':
-        resnet = resnet_models.ResNet50(image_input, include_top=False, freeze_bn=freeze_bn)
-        # resnet = ResNet50(input_tensor=image_input, include_top=False)
-    elif backbone == 'resnet101':
-        resnet = resnet_models.ResNet101(image_input, include_top=False, freeze_bn=freeze_bn)
-    else:
-        resnet = resnet_models.ResNet152(image_input, include_top=False, freeze_bn=freeze_bn)
+    if backbone == 'effcientnet-b0':
+        efficientnet = tf.keras.applications.EfficientNetB0(input_tensor=image_input, weights='imagenet', include_top=False)
+        # TODO freeze_bn?
 
     # (b, 16, 16, 2048)
-    C5 = resnet.outputs[-1]
+    C5 = efficientnet.outputs[-1]
     # C5 = resnet.get_layer('activation_49').output
 
     x = Dropout(rate=0.5)(C5)

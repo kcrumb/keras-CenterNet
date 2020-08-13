@@ -279,6 +279,8 @@ def parse_args(args):
     parser.add_argument('--multi-scale', help='Multi-Scale training', default=False, action='store_true')
     parser.add_argument('--compute-val-loss', help='Compute validation loss during training', dest='compute_val_loss',
                         action='store_true')
+    parser.add_argument('--backbone', choices=['resnet50', 'resnet101', 'resnet152'], default='resnet50',
+                        help='Chooses ResNet backbone')
 
     # Fit generator arguments
     parser.add_argument('--multiprocessing', help='Use multiprocessing in fit_generator.', action='store_true')
@@ -306,7 +308,7 @@ def main(args=None):
 
     num_classes = train_generator.num_classes()
     model, prediction_model, debug_model = centernet(num_classes=num_classes, input_size=args.input_size,
-                                                     freeze_bn=True)
+                                                     freeze_bn=True, backbone=args.backbone)
 
     # create the model
     print('Loading model, this may take a second...')

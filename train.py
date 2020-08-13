@@ -281,6 +281,7 @@ def parse_args(args):
                         action='store_true')
     parser.add_argument('--backbone', choices=['resnet50', 'resnet101', 'resnet152'], default='resnet50',
                         help='Chooses ResNet backbone')
+    parser.add_argument('--learning_rate', type=float, default=1e-3, help='Learning rate for the optimizer.')
 
     # Fit generator arguments
     parser.add_argument('--multiprocessing', help='Use multiprocessing in fit_generator.', action='store_true')
@@ -321,7 +322,7 @@ def main(args=None):
             model.layers[i].trainable = False
 
     # compile model
-    model.compile(optimizer=Adam(lr=1e-3), loss={'centernet_loss': lambda y_true, y_pred: y_pred})
+    model.compile(optimizer=Adam(lr=args.learning_rate), loss={'centernet_loss': lambda y_true, y_pred: y_pred})
     # model.compile(optimizer=SGD(lr=1e-5, momentum=0.9, nesterov=True, decay=1e-5),
     #               loss={'centernet_loss': lambda y_true, y_pred: y_pred})
 

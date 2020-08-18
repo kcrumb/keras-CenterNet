@@ -100,7 +100,7 @@ def create_callbacks(training_model, prediction_model, validation_generator, arg
                 '{dataset_type}_{{epoch:02d}}_{{loss:.4f}}_{{val_loss:.4f}}.h5'.format(dataset_type=args.dataset_type)
             ),
             verbose=1,
-            # save_best_only=True,
+            save_best_only=True,
             # monitor="mAP",
             # mode='max'
         )
@@ -278,6 +278,7 @@ def parse_args(args):
     parser.add_argument('--multi-scale', help='Multi-Scale training', default=False, action='store_true')
     parser.add_argument('--compute-val-loss', help='Compute validation loss during training', dest='compute_val_loss',
                         action='store_true')
+    parser.add_argument('--learning_rate', type=float, default=1e-3, help='Learning rate for the optimizer.')
 
     # Fit generator arguments
     parser.add_argument('--multiprocessing', help='Use multiprocessing in fit_generator.', action='store_true')
@@ -318,7 +319,7 @@ def main(args=None):
             model.layers[i].trainable = False
 
     # compile model
-    model.compile(optimizer=Adam(lr=1e-3), loss={'centernet_loss': lambda y_true, y_pred: y_pred})
+    model.compile(optimizer=Adam(lr=args.learning_rate), loss={'centernet_loss': lambda y_true, y_pred: y_pred})
     # model.compile(optimizer=SGD(lr=1e-5, momentum=0.9, nesterov=True, decay=1e-5),
     #               loss={'centernet_loss': lambda y_true, y_pred: y_pred})
 

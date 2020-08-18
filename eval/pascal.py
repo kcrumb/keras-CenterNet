@@ -87,13 +87,16 @@ class Evaluate(keras.callbacks.Callback):
         else:
             self.mean_ap = sum(precisions) / sum(x > 0 for x in total_instances)
 
-        if self.tensorboard is not None and self.tensorboard.writer is not None:
+        if self.tensorboard is not None:
             import tensorflow as tf
-            summary = tf.Summary()
-            summary_value = summary.value.add()
-            summary_value.simple_value = self.mean_ap
-            summary_value.tag = "mAP"
-            self.tensorboard.writer.add_summary(summary, epoch)
+            writer = tf.summary.create_file_writer(self.tensorboard.log_dir)
+            tf.summary.scalar("mAP", self.mean_ap)
+            writer.flush()
+            # summary = tf.compat.v1.Summary()
+            # summary_value = summary.value.add()
+            # summary_value.simple_value = self.mean_ap
+            # summary_value.tag = "mAP"
+            # self.tensorboard.writer.add_summary(summary, epoch)
 
         logs['mAP'] = self.mean_ap
 

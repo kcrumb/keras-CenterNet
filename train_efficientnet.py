@@ -314,8 +314,7 @@ def main(args=None):
 
     # freeze layers
     if args.freeze_backbone:
-        for i in range(190):
-        # for i in range(175):
+        for i in range(len(model.layers)):
             model.layers[i].trainable = False
 
     # compile model

@@ -14,11 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-import keras
+# import keras
 from .common import evaluate
+import tensorflow as tf
 
 
-class Evaluate(keras.callbacks.Callback):
+class Evaluate(tf.keras.callbacks.Callback):
     """
     Evaluation callback for arbitrary datasets.
     """

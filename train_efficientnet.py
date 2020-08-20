@@ -21,7 +21,7 @@ import keras.preprocessing.image
 import os
 import sys
 import tensorflow as tf
-import keras
+# import keras
 
 from augmentor.color import VisualEffect
 from augmentor.misc import MiscEffect

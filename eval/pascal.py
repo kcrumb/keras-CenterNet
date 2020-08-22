@@ -82,6 +82,8 @@ class Evaluate(keras.callbacks.Callback):
                       self.generator.label_to_name(label), 'with average precision: {:.4f}'.format(average_precision))
             total_instances.append(num_annotations)
             precisions.append(average_precision)
+        print('precisions', precisions)
+        print('total_instances', total_instances)
         if self.weighted_average:
             self.mean_ap = sum([a * b for a, b in zip(total_instances, precisions)]) / sum(total_instances)
         else:

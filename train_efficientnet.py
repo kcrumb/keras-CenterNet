@@ -304,7 +304,7 @@ def main(args=None):
     # create the generators
     train_generator, validation_generator = create_generators(args)
 
-    num_classes = train_generator.num_classes()
+    num_classes = train_generator.num_classes() - 1
     model, prediction_model, debug_model = centernet(num_classes=num_classes, input_size=args.input_size,
                                                      freeze_bn=True)
 

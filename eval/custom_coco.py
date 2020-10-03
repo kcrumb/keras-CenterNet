@@ -249,9 +249,9 @@ def evaluate_coco(
     coco_eval.summarize()
 
     print()
-    print("Total time:             ", total_time, " sec")
+    print("Total time:             ", round(total_time, 7), "sec")
     print("Image count:            ", img_count)
-    print("Average detection time: ", (total_time / img_count), " sec")
+    print("Average detection time: ", round((total_time / img_count), 7), "sec")
 
     return coco_eval.stats
 

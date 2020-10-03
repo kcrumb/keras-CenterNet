@@ -267,6 +267,7 @@ def parse_args(args):
     parser.add_argument('--coco_true', help='Path to JSON COCO ground truth.')
     parser.add_argument('--det_json_path', help='Folder in which the JSON with the detected boxes are saved.')
     parser.add_argument('--backbone', choices=['resnet50', 'resnet101', 'resnet152'], help='Chooses ResNet backbone')
+    parser.add_argument('--gpu', help='Id of the GPU to use (as reported by nvidia-smi).')
     print(vars(parser.parse_args(args)))
     return parser.parse_args(args)
 
@@ -281,7 +282,9 @@ def main(args=None):
     from models.resnet import centernet
     import os
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+    if args.gpu:
+        os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
+
     test_generator = CSVGenerator(
         args.csv_data_file,
         args.csv_class_file,

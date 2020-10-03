@@ -23,6 +23,7 @@ import json
 from pycocotools.cocoeval import COCOeval
 from pycocotools.coco import COCO
 import os
+from timeit import default_timer as timer
 
 from utils.compute_overlap import compute_overlap
 from utils.visualization import draw_detections, draw_annotations
@@ -86,6 +87,9 @@ def _get_detections(generator, model, score_threshold=0.05, max_detections=100, 
     all_detections = [[None for i in range(generator.num_classes()) if generator.has_label(i)] for j in
                       range(generator.size())]
 
+    total_time = 0
+    img_count = 0
+
     for i in progressbar.progressbar(range(generator.size()), prefix='Running network: '):
         image = generator.load_image(i)
         src_image = image.copy()
@@ -107,7 +111,11 @@ def _get_detections(generator, model, score_threshold=0.05, max_detections=100, 
         else:
             inputs = np.expand_dims(image, axis=0)
         # run network
+        img_count += 1
+        start = timer()
         detections = model.predict_on_batch(inputs)[0]
+        end = timer()
+        total_time += (end - start)
         scores = detections[:, 4]
         # select indices which have a score above the threshold
         indices = np.where(scores > score_threshold)[0]
@@ -140,7 +148,7 @@ def _get_detections(generator, model, score_threshold=0.05, max_detections=100, 
         for class_id in range(generator.num_classes()):
             all_detections[i][class_id] = detections[detections[:, -1] == class_id, :-1]
 
-    return all_detections
+    return all_detections, total_time, img_count
 
 
 def _get_annotations(generator):
@@ -200,7 +208,7 @@ def evaluate_coco(
         A dict mapping class names to mAP scores.
     """
     # gather all detections and annotations
-    all_detections = _get_detections(generator, model, score_threshold=score_threshold, max_detections=max_detections,
+    all_detections, total_time, img_count = _get_detections(generator, model, score_threshold=score_threshold, max_detections=max_detections,
                                      visualize=visualize, flip_test=flip_test, keep_resolution=keep_resolution)
 
     results = []
@@ -223,7 +231,6 @@ def evaluate_coco(
                 'category_id': 0,
                 'score': float(np.around(box[4], decimals=3)),
                 'bbox': box_coco,
-                # 'bbox': [int(x) for x in list(np.round(box[:4]))],
             }
             # append detection to results
             results.append(image_result)
@@ -240,6 +247,12 @@ def evaluate_coco(
     coco_eval.evaluate()
     coco_eval.accumulate()
     coco_eval.summarize()
+
+    print()
+    print("Total time:             ", total_time, " sec")
+    print("Image count:            ", img_count)
+    print("Average detection time: ", (total_time / img_count), " sec")
+
     return coco_eval.stats
 
 

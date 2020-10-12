@@ -292,7 +292,7 @@ def main(args=None):
     )
     model_path = args.model_file
     num_classes = test_generator.num_classes()
-    flip_test = False
+    flip_test = True
     nms = True
     keep_resolution = False
     score_threshold = 0.01
